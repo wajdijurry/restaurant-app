@@ -5,6 +5,7 @@
 FROM php:8.0.2-cli
 
 ARG DEBIAN_FRONTEND=noninteractive
+ARG APP_ENV=local
 
 # Important! To prevent this warning "debconf: unable to initialize frontend"
 RUN apt-get install -yq apt-utils git 2>&1 | grep -v "debconf: delaying package configuration, since apt-utils is not installed"

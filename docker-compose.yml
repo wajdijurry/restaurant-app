@@ -12,7 +12,7 @@ services:
       MYSQL_DATABASE: ${DB_DATABASE}
       TZ: ${APP_TIMEZONE}
     ports:
-      - ${DB_PORT}:3301
+      - ${DB_PORT}:3306
     network_mode: bridge
 
   app:
