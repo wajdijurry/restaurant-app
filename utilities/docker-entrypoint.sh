@@ -12,4 +12,7 @@ php artisan optimize:clear
 # Execute migrations
 php artisan migrate --no-interaction
 
+# Seeding data
+php artisan db:seed
+
 exec "$@"
