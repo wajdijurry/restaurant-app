@@ -21,7 +21,7 @@ APP_DEBUG=true
 APP_URL=http://localhost
 ...
 ```
-
+#### Using Docker
 3. Build a new image:
 ```bash
 docker build -t restaurant-app-image .
@@ -53,9 +53,54 @@ FYI: Database (MySQL) info (You are free to change the port through .env file):
 Host: localhost:3301 
 ```
 
+#### On host machine
+> Prerequisites
+> - PHP >= 8.0
+> - MySQL >= 8.0
+
+3. Install dependencies
+```bash
+chmod +x utilities/install-dependencies.sh && ./utilities/install-dependencies.sh
+```
+
+4. Install PHP extensions
+```bash
+chmod +x utilities/install-php-extensions.sh && ./utilities/install-php-extensions.sh
+```
+
+5. Install composer & APP dependencies
+```bash
+rm -rf vendor composer.lock && \
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    composer clearcache && \
+    composer install
+```
+
+6. Prepare the app
+```bash
+# Make artisan executable
+RUN chmod +x artisan
+
+# Flush all cache
+php artisan optimize:clear
+
+# Execute migrations
+php artisan migrate
+
+# Seeding data
+php artisan db:seed
+```
+
 ---
 ### Unit test
+
+#### Using docker
 To run the unit test, just run this command:
 ```bash
 docker-compose up app-test
+```
+
+#### On host machine
+```bash
+vendor/bin/phpunit -c tests/phpunit.xml
 ```
