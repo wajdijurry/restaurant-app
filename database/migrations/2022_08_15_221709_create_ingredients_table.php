@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    const TABLE_NAME = 'users';
+    const TABLE_NAME = 'ingredients';
 
     /**
      * Run the migrations.
@@ -17,12 +17,10 @@ return new class extends Migration
     {
         Schema::create(self::TABLE_NAME, function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->enum('type', \App\Enums\UserTypeEnum::getTypes());
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
+            $table->uuid('merchant_id');
+            $table->string('title');
+            $table->decimal('quantity');
+            $table->decimal('consumed')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

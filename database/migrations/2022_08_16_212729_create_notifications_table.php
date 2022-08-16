@@ -6,8 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    const TABLE_NAME = 'users';
-
     /**
      * Run the migrations.
      *
@@ -15,16 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create(self::TABLE_NAME, function (Blueprint $table) {
+        Schema::create('notifications', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->enum('type', \App\Enums\UserTypeEnum::getTypes());
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
+            $table->string('type');
+            $table->morphs('notifiable');
+            $table->text('data');
+            $table->timestamp('read_at')->nullable();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -35,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(self::TABLE_NAME);
+        Schema::dropIfExists('notifications');
     }
 };

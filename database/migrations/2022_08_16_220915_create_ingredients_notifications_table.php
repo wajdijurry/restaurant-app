@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    const TABLE_NAME = 'users';
+    const TABLE_NAME = 'ingredients_notifications';
 
     /**
      * Run the migrations.
@@ -16,13 +16,9 @@ return new class extends Migration
     public function up()
     {
         Schema::create(self::TABLE_NAME, function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->enum('type', \App\Enums\UserTypeEnum::getTypes());
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
+            $table->id();
+            $table->uuid('merchant_id');
+            $table->uuid('ingredient_id');
             $table->timestamps();
             $table->softDeletes();
         });
