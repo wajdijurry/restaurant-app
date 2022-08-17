@@ -2,71 +2,55 @@
 
 namespace App\Repositories;
 
-use App\Models\Ingredient;
-use App\Models\OrderItem;
+use App\Models\Quantity;
+use Illuminate\Support\Facades\DB;
 
 class IngredientRepository
 {
-    /**
-     * Reduce ingredients quantity and send email to merchant
-     *
-     * @param OrderItem[] $items
-     * @return array
-     * @throws \Throwable
-     */
     public function reduceQuantities(array $items)
     {
-        $products = $quantities = $totalQuantity = $ingredientThresholds = [];
+        $productIds = array_column($items, 'product_id');
 
-        foreach ($items as $item) {
-            $products[] = $item->product;
-        }
+        $allProductsQuery = join(' UNION ALL ', array_map(function ($productId) {
+            return sprintf('SELECT \'%s\' id', $productId);
+        }, $productIds));
 
-        foreach ($products as $product) {
-            $quantities[] = $product->quantities->all();
-        }
+        $quantities = Quantity::query()
+            ->select([
+                'quantities.id as id',
+                'p.id as product_id',
+                'quantities.quantity as product_quantity',
+                'i.id as ingredient_id',
+                'i.quantity as ingredient_quantity',
+                'i.consumed',
+                'i.title as ingredient_title'
+            ])
+            ->rightJoin('products as p', 'p.id', '=', 'quantities.product_id')
+            ->rightJoin('ingredients as i', 'i.id', '=', 'quantities.ingredient_id')
+            ->joinSub((string) DB::raw($allProductsQuery), 'ap', 'ap.id', '=', 'p.id')
+            ->get();
+
+        $ingredients = $quantities->map->only(['ingredient_id', 'consumed'])
+            ->unique()->pluck('consumed', 'ingredient_id')->all();
+
+        $ingredientsThresholds = [];
 
         foreach ($quantities as $quantity) {
-            $totalQuantity[] = array_column($quantity, 'quantity', 'ingredient_id');
-        }
+            $ingredients[$quantity->ingredient_id] += $quantity->product_quantity;
 
-        $ingredientsIds = array_unique(array_merge(...array_map(function ($productIngredients) {
-            return array_keys($productIngredients);
-        }, $totalQuantity)));
-
-        // Initialize ingredients array
-        $quantitySum = array_combine(
-            array_reverse($ingredientsIds),
-            array_fill(0, count($ingredientsIds), 0)
-        );
-
-        array_reduce($totalQuantity, function ($initial, $quantity) use (&$quantitySum) {
-            foreach ($quantity as $ingredientId => $quantum) {
-                $quantitySum[$ingredientId] += $quantum;
-            }
-        });
-
-        /** @var Ingredient[] $ingredients */
-        $ingredients = Ingredient::query()
-            ->whereIn('id', $ingredientsIds)
-            ->get()
-            ->all();
-
-        foreach ($ingredients as $ingredient) {
-            $ingredient->consumed += $quantitySum[$ingredient->id];
-
-            if ($ingredient->consumed > $ingredient->quantity) {
-                throw new \Exception(sprintf('Quantity exceeded for %s', $ingredient->title));
+            if ($quantity->consumed > $ingredients[$quantity->ingredient_id]) {
+                throw new \Exception(sprintf('Quantity exceeded for %s', $quantity->ingredient_title));
             }
 
-            $ingredient->updateOrFail();
+            $quantity->ingredient->update(['consumed' => $ingredients[$quantity->ingredient_id]]);
 
-            if ($ingredient->consumed / $ingredient->quantity > 0.5) {
+            if ($quantity->consumed / $quantity->ingredient_quantity > 0.5) {
                 // notify when below 50%, as requested
-                $ingredientThresholds[] = $ingredient;
+                $ingredientsThresholds[$quantity->ingredient->id] = $quantity->ingredient;
             }
+
         }
 
-        return $ingredientThresholds;
+        return $ingredientsThresholds;
     }
 }

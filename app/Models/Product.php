@@ -32,16 +32,6 @@ class Product extends Model
     ];
 
     /**
-     * Get product ingredients quantities
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function quantities()
-    {
-        return $this->hasMany(Quantity::class, 'product_id', 'id');
-    }
-
-    /**
      * Get product ingredients
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
@@ -52,9 +42,9 @@ class Product extends Model
             Ingredient::class,
             Quantity::class,
             'product_id',
-            'ingredient_id',
             'id',
-            'id'
+            'id',
+            'ingredient_id'
         );
     }
 

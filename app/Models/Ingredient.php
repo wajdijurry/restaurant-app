@@ -23,4 +23,16 @@ class Ingredient extends Model
     protected $fillable = [
         'id', 'name', 'quantity', 'consumed', 'merchant_id'
     ];
+
+    public function products()
+    {
+        return $this->hasManyThrough(
+            Product::class,
+            Quantity::class,
+            'ingredient_id',
+            'id',
+            'id',
+            'product_id'
+        );
+    }
 }

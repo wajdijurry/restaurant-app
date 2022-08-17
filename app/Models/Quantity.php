@@ -18,4 +18,14 @@ class Quantity extends Model
     protected $fillable = [
         'product_id', 'ingredient_id', 'quantity'
     ];
+
+    /**
+     * Get ingredient of a quantity
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function ingredient()
+    {
+        return $this->belongsTo(Ingredient::class);
+    }
 }
