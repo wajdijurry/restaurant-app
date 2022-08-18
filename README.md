@@ -94,10 +94,12 @@ php artisan db:seed
 ---
 ### Unit test
 
+> You need to have `.env.testing` file to get tests run correctly
+> 
 #### Using docker
 To run the unit test, just run this command:
 ```bash
-docker-compose up app-test
+docker-compose --env-file .env.testing up app-test
 ```
 
 #### On host machine

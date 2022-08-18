@@ -9,6 +9,11 @@ class IngredientRepository
 {
     public function reduceQuantities(array $items)
     {
+        if (empty($items)) {
+            // Covering OrderSeeder
+            return [];
+        }
+
         $productIds = array_column($items, 'product_id');
 
         $allProductsQuery = join(' UNION ALL ', array_map(function ($productId) {
@@ -38,13 +43,13 @@ class IngredientRepository
         foreach ($quantities as $quantity) {
             $ingredients[$quantity->ingredient_id] += $quantity->product_quantity;
 
-            if ($quantity->consumed > $ingredients[$quantity->ingredient_id]) {
+            $quantity->ingredient->update(['consumed' => $quantity->ingredient->consumed + $quantity->product_quantity]);
+
+            if ($quantity->ingredient->consumed > $quantity->ingredient->quantity) {
                 throw new \Exception(sprintf('Quantity exceeded for %s', $quantity->ingredient_title));
             }
 
-            $quantity->ingredient->update(['consumed' => $ingredients[$quantity->ingredient_id]]);
-
-            if ($quantity->consumed / $quantity->ingredient_quantity > 0.5) {
+            if ($quantity->ingredient->consumed / $quantity->ingredient_quantity > 0.5) {
                 // notify when below 50%, as requested
                 $ingredientsThresholds[$quantity->ingredient->id] = $quantity->ingredient;
             }

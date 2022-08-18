@@ -9,7 +9,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
 
 /**
  * @property string $id
@@ -41,16 +40,6 @@ class Order extends Model
         self::observe([
             OrderItemObserver::class
         ]);
-    }
-
-    /**
-     * Get order ID
-     *
-     * @return string
-     */
-    public function getIdAttribute()
-    {
-        return $this->id ?? $this->id = Str::uuid()->toString();
     }
 
     /**

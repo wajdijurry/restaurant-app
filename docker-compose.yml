@@ -15,6 +15,22 @@ services:
       - ${DB_PORT}:3306
     network_mode: bridge
 
+  test-db:
+    image: "mysql:8.0.2"
+    container_name: restaurant-test-db
+    volumes:
+      - mysql-test-dev:/var/lib/mysql
+    env_file: .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      TZ: ${APP_TIMEZONE}
+    ports:
+      - ${DB_PORT}:3306
+    network_mode: bridge
+
   app:
     build:
       context: .
@@ -32,6 +48,23 @@ services:
     depends_on:
       - db
 
+  app-test:
+    build:
+      context: .
+    working_dir: /app
+    image: restaurant-app-image
+    command: php artisan test
+    container_name: restaurant-test-app
+    volumes:
+      - .:/app
+      - /app/vendor
+    env_file: .env.testing
+    network_mode: bridge
+    depends_on:
+      - test-db
+
 volumes:
   mysql-dev:
+    driver: local
+  mysql-test-dev:
     driver: local

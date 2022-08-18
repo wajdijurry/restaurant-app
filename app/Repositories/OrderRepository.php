@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class OrderRepository
 {
@@ -26,6 +27,7 @@ class OrderRepository
                     ->first();
 
                 $order = new Order([
+                    'id' => Str::uuid()->toString(),
                     'user_id' => $data['user_id'],
                     'merchant_id' => $merchant->id
                 ]);

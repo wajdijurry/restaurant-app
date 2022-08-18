@@ -35,6 +35,7 @@ class UserSeeder extends SequentialSeeder
             ]
         ]);
 
+        self::$user = $users[0];
         self::$merchant = $users[1];
     }
 }

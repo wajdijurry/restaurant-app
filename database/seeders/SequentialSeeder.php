@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Ingredient;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -25,4 +26,14 @@ abstract class SequentialSeeder extends Seeder
      * @var User
      */
     protected static $merchant;
+
+    /**
+     * @var User
+     */
+    protected static $user;
+
+    /**
+     * @var Order
+     */
+    protected static $order;
 }
