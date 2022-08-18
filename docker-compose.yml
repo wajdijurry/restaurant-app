@@ -20,7 +20,7 @@ services:
     container_name: restaurant-test-db
     volumes:
       - mysql-test-dev:/var/lib/mysql
-    env_file: .env
+    env_file: .env.testing
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_USER: ${DB_USERNAME}
