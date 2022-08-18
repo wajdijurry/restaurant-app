@@ -6,6 +6,7 @@ use App\Enums\UserTypeEnum;
 use App\Models\Traits\UuidPrimary;
 use App\Observers\OrderItemObserver;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $user_id
  * @property string $merchant_id
  * @property User $merchant
- * @property OrderItem[] $items
+ * @property Collection $items
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */

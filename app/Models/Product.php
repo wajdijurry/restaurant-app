@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Traits\UuidPrimary;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $id
  * @property string $merchant_id
  * @property string $title
- * @property Ingredient[] $ingredients
+ * @property Collection $ingredients
  * @property Quantity[] $quantities
  * @property Carbon $created_at
  * @property Carbon $updated_at

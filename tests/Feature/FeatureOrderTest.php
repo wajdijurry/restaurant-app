@@ -3,11 +3,13 @@
 namespace Tests\Feature;
 
 use App\Enums\UserTypeEnum;
+use App\Models\IngredientsNotifications;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
 use App\Repositories\IngredientRepository;
+use App\Repositories\OrderRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -21,11 +23,14 @@ class FeatureOrderTest extends TestCase
 
     private IngredientRepository$ingredientRepository;
 
+    private OrderRepository $orderRepository;
+
     public function setUp(): void
     {
         parent::setUp();
 
         $this->ingredientRepository = new IngredientRepository();
+        $this->orderRepository = new OrderRepository();
         $this->user = User::query()->where('type', UserTypeEnum::USER_TYPE_CUSTOMER)->first();
         $this->merchant = User::query()->where('type', UserTypeEnum::USER_TYPE_MERCHANT)->first();
     }
@@ -108,5 +113,34 @@ class FeatureOrderTest extends TestCase
         ])->first()->all();
 
         $this->ingredientRepository->reduceQuantities($items);
+    }
+
+    public function test_merchant_ingredient_notification()
+    {
+        /** @var Product $product */
+        $product = Product::query()->firstOrFail();
+
+        $this->orderRepository->create([
+            'user_id' => $this->user->id,
+            'products' => [
+                [
+                    'product_id' => $product->id,
+                    'quantity' => 26
+                ]
+            ]
+        ]);
+
+        $ingredients  = $product->ingredients;
+
+        $merchantNotifications = IngredientsNotifications::query()
+            ->whereIn('ingredient_id', $ingredients->pluck('id')->all())
+            ->where('merchant_id', $this->merchant->id)
+            ->get()->all();
+
+        $this->assertNotEmpty($merchantNotifications);
+
+        foreach ($merchantNotifications as $merchantNotification) {
+            $this->assertModelExists($merchantNotification);
+        }
     }
 }

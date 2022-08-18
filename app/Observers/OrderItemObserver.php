@@ -22,7 +22,6 @@ class OrderItemObserver
     {
         self::$reducedIngredients = self::$ingredientRepository->reduceQuantities($order->items->all());
     }
-
     public static function created(Order $order)
     {
         $merchant = $order->merchant;
@@ -30,4 +29,5 @@ class OrderItemObserver
             $merchant->notify(new IngredientQuantityThreshold($notifyFor));
         }
     }
+
 }
